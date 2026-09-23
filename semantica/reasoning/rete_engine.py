@@ -114,6 +114,11 @@ def unify_condition(
     bindings = dict(initial_bindings or {})
     pattern = condition if isinstance(condition, str) else str(condition)
     fact_str = str(fact)
+    _, sep, args = pattern.partition("(")
+    flat = fact_str.count(",") == len(fact.arguments) - 1
+    if sep and args.endswith(")") and "(" not in args and flat:
+        if (args[:-1].count(",") + 1 if args != ")" else 0) != len(fact.arguments):
+            return None
 
     # Build the anchored regex once (variables already bound are inlined as
     # literals). See ``_build_condition_regex`` for the segment handling.
